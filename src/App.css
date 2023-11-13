@@ -169,4 +169,14 @@ body {
   color:black;
   transition:.5s all ease;
 }
-
+.noTodosContainer
+{
+  display:flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+  margin: 3em auto 0;
+  color:dimgray;
+  letter-spacing:.01em;
+  font-style: italic;
+}

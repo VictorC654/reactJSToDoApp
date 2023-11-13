@@ -5,9 +5,10 @@ import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faClipboardList} from "@fortawesome/free-solid-svg-icons";
 import { faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 
-library.add(faXmark, faMagnifyingGlass);
+library.add(faXmark, faMagnifyingGlass, faClipboardList);
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(

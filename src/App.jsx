@@ -1,7 +1,9 @@
 import {useState} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './App.css';
-import Another from "./components/Another";
+import TodoList from "./components/TodoList";
+import TodoForm from "./components/TodoForm";
+import NoTodoContainer from "./components/NoTodoContainer";
 function App() {
   const [todos, setTodos] = useState([
     {
@@ -23,22 +25,12 @@ function App() {
       isEditing:false,
     }
   ]);
-  const [todoInput, setTodoInput] = useState('');
   const [idForToDo, setIdForToDo] = useState(4);
 
-  function handleInput(event)
+
+  function addTodo(todo)
   {
-    setTodoInput(event.target.value);
-  }
-  function addTodo(event)
-  {
-    event.preventDefault();
-    if(todoInput.trim().length === 0)
-    {
-      return;
-    }
-    setTodos([...todos, { id:idForToDo, title:todoInput, isComplete: false}]);
-    setTodoInput('');
+    setTodos([...todos, { id:idForToDo, title:todo, isComplete: false}]);
     setIdForToDo(prevState => prevState + 1);
   }
   function deleteTodo(id)
@@ -73,7 +65,6 @@ function App() {
     console.log(event.target.value);
     if(event.target.value.length === 0)
     {
-      alert("You cannot leave the input empty.")
       return;
     }
     const updatedTodo = todos.map(todo => {
@@ -95,68 +86,33 @@ function App() {
           Todo App
         </h1>
         <div className="FormContainer">
-          <form action="#" onSubmit={addTodo} style={{width:'100%'}}>
-            <input type="text"
-                   placeholder="What do you need to do?"
-                   value={todoInput}
-                   onChange={handleInput}
-            />
-          </form>
-          <div className="UpdateTasks">
-            { todos.map((todo,index) => (
-              <div key={todo.id} className="Task">
-                <input type="checkbox"
-                onChange={ () => completeToDo(todo.id)}
-                checked={todo.isComplete}
-                />
-                { !todo.isEditing ?
-                    (
-                        <span onDoubleClick={() => markAsEditing(todo.id) }
-                                   className={!todo.isComplete ? 'label' : 'label checked'}>
-                          { todo.title }
-                        </span>
-                    ) : (
-                        <input
-                               className="UpdateInput"
-                               type="text"
-                               defaultValue={todo.title}
-                               style={{marginLeft:'1em'}}
-                               autoFocus
-                               onBlur={(event) => updateTodo(event, todo.id)}
-                               onKeyDown={event => {
-                                 if (event.key === 'Enter')
-                                 {
-                                   updateTodo(event,todo.id);
-                                 } else if(event.key === 'Escape')
-                                 {
-                                   markAsEditing(todo.id);
-                                 }
-                               }}
-                        />
-                    )
-                }
-                <button onClick={() => deleteTodo(todo.id)} className="DeleteButton">
-                  <FontAwesomeIcon icon="fa-solid fa-xmark" />
-                </button>
-              </div>
-            ))
-            }
-          </div>
-          <div className="CheckAllContainer">
-            <button className="CheckAllButton">
-              Check All
-            </button>
-            <div className="NumberOfItemsRemaining">
-              3 items remaining
+          <TodoForm addTodo={addTodo} />
+          {todos.length > 0 ? ( <div>
+            <div className="UpdateTasks">
+                  <TodoList completeToDo={completeToDo}
+                            todos={todos}
+                            markAsEditing={markAsEditing}
+                            deleteTodo={deleteTodo}
+                            updateTodo={updateTodo}
+                  />
             </div>
-          </div>
-          <div className="FilterContainer">
-            <button>All</button>
-            <button className="ActiveButton" style={{marginLeft:'.5em'}}>Active</button>
-            <button style={{marginLeft:'.5em'}}>Completed</button>
-            <button style={{ marginLeft:'auto'}} className="ActiveButton">Clear completed</button>
-          </div>
-        </div>
+            <div className="CheckAllContainer">
+              <button className="CheckAllButton">
+                Check All
+              </button>
+              <div className="NumberOfItemsRemaining">
+                { todos.length } items remaining
+              </div>
+            </div>
+            <div className="FilterContainer">
+              <button>All</button>
+              <button className="ActiveButton" style={{marginLeft:'.5em'}}>Active</button>
+              <button style={{marginLeft:'.5em'}}>Completed</button>
+              <button style={{ marginLeft:'auto'}} className="ActiveButton">Clear completed</button>
+            </div>
+          </div> ) : (<NoTodoContainer />)
+          }
+      </div>
       </div>
     </div>
   );
