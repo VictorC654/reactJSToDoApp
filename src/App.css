@@ -22,7 +22,7 @@ body {
   flex-direction:column;
   justify-content:center;
 }
-input[type=text]
+.FormContainer input[type=text]
 {
   border-radius:.2em;
   border:none;
@@ -31,6 +31,7 @@ input[type=text]
   padding:1em;
   outline:none;
 }
+
 .UpdateTasks
 {
   display:flex;
@@ -45,6 +46,12 @@ input[type=text]
   padding:1em 0 1em 0;
   font-size:1.1em;
 }
+
+.UpdateTasks .Task .checked
+{
+  text-decoration: line-through;
+  font-style: italic;
+}
 .Task .DeleteButton
 {
   font-weight:bold;
@@ -53,6 +60,31 @@ input[type=text]
   border:none;
   background-color:transparent;
   transition:.5s all ease;
+}
+.UpdateTasks .Task .label
+{
+  margin-left:.3em;
+  color: rgb(128, 128, 128);
+  font-size:.9em;
+  padding:.7em;
+  transition:.1s all ease;
+  cursor:pointer;
+}
+.UpdateTasks .Task .label:hover
+{
+  color:black;
+  transition:.1s all ease;
+}
+.Task input[type=text]
+{
+  width:30em;
+  border-radius:.2em;
+  border:none;
+  box-shadow:2px 3px 3px 3px lightgray;
+  font-size:.9em;
+  padding:.7em;
+  outline:none;
+  color: black;
 }
 .Task .DeleteButton:hover
 {
