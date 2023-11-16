@@ -1,9 +1,12 @@
-import {useState} from "react";
+import React, {useState} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './App.css';
 import TodoList from "./components/TodoList";
 import TodoForm from "./components/TodoForm";
 import NoTodoContainer from "./components/NoTodoContainer";
+import TodoItemsRemaining from "./components/TodoItemsRemaining";
+import TodoCheckAllButton from "./components/TodoCheckAllButton";
+import TodosFilter from "./components/TodosFilter"
 function App() {
   const [todos, setTodos] = useState([
     {
@@ -26,8 +29,6 @@ function App() {
     }
   ]);
   const [idForToDo, setIdForToDo] = useState(4);
-
-
   function addTodo(todo)
   {
     setTodos([...todos, { id:idForToDo, title:todo, isComplete: false}]);
@@ -47,6 +48,20 @@ function App() {
         return todo;
     });
     setTodos(updatedTodo);
+  }
+  function completeAllTodos()
+  {
+    const updatedTodo = todos.map(todo=> {
+        todo.isComplete = true;
+      return todo;
+    });
+    setTodos(updatedTodo);
+  }
+  function clearCompletedTodos()
+  {
+    setTodos(current => current.filter(todo => {
+      return todo.isComplete !== true;
+    }))
   }
   function markAsEditing(id)
   {
@@ -78,9 +93,26 @@ function App() {
     setTodos(updatedTodo);
   }
 
+  function todosFiltered(filter)
+  {
+    if(filter === "all")
+    {
+      return todos;
+    }
+    if(filter === "active")
+    {
+      return todos.filter(todo => !todo.isComplete);
+    }
+    if(filter === "completed")
+    {
+      return todos.filter(todo => todo.isComplete);
+    }
+  }
+
+  const [filter, setFilter] = useState("all");
+
   return (
     <div className="App" style={{display:'flex',flexDirection:'column',alignItems:'center',}}>
-      {/*<Another />*/}
       <div className="Container" style={{marginTop:'2em'}}>
         <h1>
           Todo App
@@ -91,25 +123,22 @@ function App() {
             <div className="UpdateTasks">
                   <TodoList completeToDo={completeToDo}
                             todos={todos}
+                            todosFiltered={todosFiltered}
                             markAsEditing={markAsEditing}
                             deleteTodo={deleteTodo}
                             updateTodo={updateTodo}
+                            filter={filter}
                   />
             </div>
             <div className="CheckAllContainer">
-              <button className="CheckAllButton">
-                Check All
-              </button>
-              <div className="NumberOfItemsRemaining">
-                { todos.length } items remaining
-              </div>
+              <TodoCheckAllButton completeAllTodos={completeAllTodos} />
+              <TodoItemsRemaining todos={todos} />
             </div>
-            <div className="FilterContainer">
-              <button>All</button>
-              <button className="ActiveButton" style={{marginLeft:'.5em'}}>Active</button>
-              <button style={{marginLeft:'.5em'}}>Completed</button>
-              <button style={{ marginLeft:'auto'}} className="ActiveButton">Clear completed</button>
-            </div>
+              <TodosFilter clearCompletedTodos={clearCompletedTodos}
+                           filter={filter}
+                           setFilter={setFilter}
+                           todosFiltered={todosFiltered}
+              />
           </div> ) : (<NoTodoContainer />)
           }
       </div>

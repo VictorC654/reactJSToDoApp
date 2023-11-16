@@ -1,17 +1,29 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import '../App.css';
 
 export default function NoTodoContainer(props)
 {
+    function checkIfNoTodosAfterFilter(filter)
+    {
+        const lenght = props.todosFiltered(filter).length;
+        if (lenght === 0)
+        {
+            return (
+                <div>Hello world</div>
+            );
+        }
+    }
+
     return (
         <div>
-            { props.todos.map((todo,index) => (
+            { props.todosFiltered(props.filter).map((todo,index) => (
                 <div key={todo.id} className="Task">
                     <input type="checkbox"
                            onChange={ () => props.completeToDo(todo.id)}
                            checked={todo.isComplete}
                     />
+
                     { !todo.isEditing ?
                         (
                             <span onDoubleClick={() => props.markAsEditing(todo.id) }
