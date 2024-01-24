@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useMemo, useRef, useState} from "react";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import './App.css';
 import TodoList from "./components/TodoList";
@@ -108,12 +108,28 @@ function App() {
       return todos.filter(todo => todo.isComplete);
     }
   }
-
   const [filter, setFilter] = useState("all");
-
+  const [name, setName] = useState("");
+  const nameInputEl = useRef(null);
+  useEffect(() => {
+        nameInputEl.current.focus();
+  }, []);
   return (
     <div className="App" style={{display:'flex',flexDirection:'column',alignItems:'center',}}>
       <div className="Container" style={{marginTop:'2em'}}>
+        <div className="UserName">
+          <h3>What is your name?</h3>
+          <form className="FormContainer" style={{marginBottom:".5em"}} action="">
+            <input type="text"
+                   ref={nameInputEl}
+                   placeholder="John Doe"
+                   value={name}
+                   onChange={event => setName(event.target.value)}/>
+          </form>
+          {name && <p className="name-label">
+            Hello, <b>{name}</b>.
+          </p>}
+        </div>
         <h1>
           Todo App
         </h1>

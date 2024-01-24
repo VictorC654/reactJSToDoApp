@@ -31,6 +31,10 @@ body {
   padding:1em;
   outline:none;
 }
+.FormContainer input[type=text]:focus
+{
+  outline:1px solid black;
+}
 
 .UpdateTasks
 {
@@ -179,4 +183,10 @@ body {
   color:dimgray;
   letter-spacing:.01em;
   font-style: italic;
+}
+.name-label
+{
+  margin-top:1em;
+  font-size:1.5em;
+  font-style:italic;
 }
