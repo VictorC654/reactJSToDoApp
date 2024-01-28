@@ -7,28 +7,11 @@ import NoTodoContainer from "./components/NoTodoContainer";
 import TodoItemsRemaining from "./components/TodoItemsRemaining";
 import TodoCheckAllButton from "./components/TodoCheckAllButton";
 import TodosFilter from "./components/TodosFilter"
+import useToggle from "./hooks/useToggle";
+import useLocalStorage from "./hooks/useLocalStorage";
 function App() {
-  const [todos, setTodos] = useState([
-    {
-      id:1,
-      title: 'Buy milk',
-      isComplete:false,
-      isEditing:false,
-    },
-    {
-      id:2,
-      title: 'Finish React Project',
-      isComplete:false,
-      isEditing:false,
-    },
-    {
-      id:3,
-      title: 'Do the dishes',
-      isComplete:true,
-      isEditing:false,
-    }
-  ]);
-  const [idForToDo, setIdForToDo] = useState(4);
+  const [todos, setTodos] = useLocalStorage('todos', []);
+  const [idForToDo, setIdForToDo] = useLocalStorage('idForToDo',1);
   function addTodo(todo)
   {
     setTodos([...todos, { id:idForToDo, title:todo, isComplete: false}]);
@@ -109,11 +92,19 @@ function App() {
     }
   }
   const [filter, setFilter] = useState("all");
-  const [name, setName] = useState("");
+  const [isFeatureOneVisible, setIsFeatureOneVisible] = useToggle(false);
+  const [isFeatureTwoVisible, setIsFeatureTwoVisible] = useToggle(false);
   const nameInputEl = useRef(null);
+  const [name, setName] = useLocalStorage('name', JSON.parse(localStorage.getItem('name')));
   useEffect(() => {
+        setName(JSON.parse(localStorage.getItem('name')));
         nameInputEl.current.focus();
   }, []);
+  function handleNameInput(event)
+  {
+    setName(event.target.value);
+    localStorage.setItem('name', JSON.stringify(event.target.value));
+  }
   return (
     <div className="App" style={{display:'flex',flexDirection:'column',alignItems:'center',}}>
       <div className="Container" style={{marginTop:'2em'}}>
@@ -124,7 +115,8 @@ function App() {
                    ref={nameInputEl}
                    placeholder="John Doe"
                    value={name}
-                   onChange={event => setName(event.target.value)}/>
+                   onChange={handleNameInput}
+            />
           </form>
           {name && <p className="name-label">
             Hello, <b>{name}</b>.
@@ -146,15 +138,23 @@ function App() {
                             filter={filter}
                   />
             </div>
-            <div className="CheckAllContainer">
-              <TodoCheckAllButton completeAllTodos={completeAllTodos} />
-              <TodoItemsRemaining todos={todos} />
+            <div className="toggleButtons">
+              <button onClick={setIsFeatureOneVisible} style={{marginRight:".5em"}}>
+                Toggle Check All Section
+              </button>
+              <button onClick={setIsFeatureTwoVisible} style={{marginLeft:".5em"}}>
+                Toggle Filter Section
+              </button>
             </div>
-              <TodosFilter clearCompletedTodos={clearCompletedTodos}
+            {isFeatureOneVisible && <div className="CheckAllContainer">
+               <TodoCheckAllButton completeAllTodos={completeAllTodos} />
+              <TodoItemsRemaining todos={todos} />
+            </div>}
+            { isFeatureTwoVisible && <TodosFilter clearCompletedTodos={clearCompletedTodos}
                            filter={filter}
                            setFilter={setFilter}
                            todosFiltered={todosFiltered}
-              />
+              />}
           </div> ) : (<NoTodoContainer />)
           }
       </div>

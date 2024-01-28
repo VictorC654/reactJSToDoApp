@@ -16,6 +16,23 @@ body {
   background-color:white;
   box-shadow:3px 3px 5px 5px lightgray;
 }
+button
+{
+  color: rgb(128, 128, 128);
+  font-size:1em;
+  padding:.5em;
+  background:transparent;
+  border:.1em solid lightgray;
+  border-radius:.3em;
+  cursor:pointer;
+  transition:.5s all ease;
+}
+button:hover
+{
+  border:.1em solid black;
+  color:black;
+  transition:.5s all ease;
+}
 .FormContainer
 {
   display:flex;
@@ -189,4 +206,10 @@ body {
   margin-top:1em;
   font-size:1.5em;
   font-style:italic;
+}
+.toggleButtons
+{
+  display:flex;
+  justify-content: center;
+  padding:1em 0em 1em 0em;
 }
