@@ -1,5 +1,4 @@
-import React, {useEffect, useMemo, useRef, useState} from "react";
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import React, {useEffect, useRef, useState} from "react";
 import './App.css';
 import TodoList from "./components/TodoList";
 import TodoForm from "./components/TodoForm";
@@ -9,72 +8,22 @@ import TodoCheckAllButton from "./components/TodoCheckAllButton";
 import TodosFilter from "./components/TodosFilter"
 import useToggle from "./hooks/useToggle";
 import useLocalStorage from "./hooks/useLocalStorage";
+import {TodosContext} from "./context/TodosContext";
+import {CSSTransition, SwitchTransition} from "react-transition-group";
 function App() {
+
   const [todos, setTodos] = useLocalStorage('todos', []);
   const [idForToDo, setIdForToDo] = useLocalStorage('idForToDo',1);
-  function addTodo(todo)
-  {
-    setTodos([...todos, { id:idForToDo, title:todo, isComplete: false}]);
-    setIdForToDo(prevState => prevState + 1);
-  }
-  function deleteTodo(id)
-  {
-    setTodos([...todos].filter(todo => todo.id !== id));
-  }
-  function completeToDo(id)
-  {
-    const updatedTodo = todos.map(todo=> {
-        if(todo.id === id)
-        {
-          todo.isComplete = !todo.isComplete;
-        }
-        return todo;
-    });
-    setTodos(updatedTodo);
-  }
-  function completeAllTodos()
-  {
-    const updatedTodo = todos.map(todo=> {
-        todo.isComplete = true;
-      return todo;
-    });
-    setTodos(updatedTodo);
-  }
-  function clearCompletedTodos()
-  {
-    setTodos(current => current.filter(todo => {
-      return todo.isComplete !== true;
-    }))
-  }
-  function markAsEditing(id)
-  {
-      const updatedTodo = todos.map(todo => {
-        if(todo.id === id)
-        {
-          todo.isEditing = !todo.isEditing;
-        }
-        return todo;
-      })
-    setTodos(updatedTodo);
-  }
+  const [filter, setFilter] = useState("all");
+  const [isFeatureOneVisible, setIsFeatureOneVisible] = useToggle(false);
+  const [isFeatureTwoVisible, setIsFeatureTwoVisible] = useToggle(false);
+  const nameInputEl = useRef(null);
+  const [name, setName] = useLocalStorage('name', JSON.parse(localStorage.getItem('name')));
 
-  function updateTodo(event, id)
-  {
-    console.log(event.target.value);
-    if(event.target.value.length === 0)
-    {
-      return;
-    }
-    const updatedTodo = todos.map(todo => {
-      if(todo.id === id)
-      {
-        todo.title = event.target.value;
-      }
-      todo.isEditing = false;
-      return todo;
-    });
-    setTodos(updatedTodo);
-  }
+  useEffect(() => {
+    setName(JSON.parse(localStorage.getItem('name')));
+    nameInputEl.current.focus();
+  }, []);
 
   function todosFiltered(filter)
   {
@@ -91,21 +40,13 @@ function App() {
       return todos.filter(todo => todo.isComplete);
     }
   }
-  const [filter, setFilter] = useState("all");
-  const [isFeatureOneVisible, setIsFeatureOneVisible] = useToggle(false);
-  const [isFeatureTwoVisible, setIsFeatureTwoVisible] = useToggle(false);
-  const nameInputEl = useRef(null);
-  const [name, setName] = useLocalStorage('name', JSON.parse(localStorage.getItem('name')));
-  useEffect(() => {
-        setName(JSON.parse(localStorage.getItem('name')));
-        nameInputEl.current.focus();
-  }, []);
   function handleNameInput(event)
   {
     setName(event.target.value);
     localStorage.setItem('name', JSON.stringify(event.target.value));
   }
   return (
+      <TodosContext.Provider value={{ todos, setTodos, idForToDo, setIdForToDo, todosFiltered, filter, setFilter }}>
     <div className="App" style={{display:'flex',flexDirection:'column',alignItems:'center',}}>
       <div className="Container" style={{marginTop:'2em'}}>
         <div className="UserName">
@@ -118,48 +59,68 @@ function App() {
                    onChange={handleNameInput}
             />
           </form>
-          {name && <p className="name-label">
-            Hello, <b>{name}</b>.
-          </p>}
+          <CSSTransition
+          in={name.length > 0}
+          classNames="slide-vertical"
+          timeout={300}
+          unmountOnExit>
+            <p className="name-label">
+              <b>{name}</b>
+            </p>
+          </CSSTransition>
         </div>
         <h1>
           Todo App
         </h1>
         <div className="FormContainer">
-          <TodoForm addTodo={addTodo} />
-          {todos.length > 0 ? ( <div>
-            <div className="UpdateTasks">
-                  <TodoList completeToDo={completeToDo}
-                            todos={todos}
-                            todosFiltered={todosFiltered}
-                            markAsEditing={markAsEditing}
-                            deleteTodo={deleteTodo}
-                            updateTodo={updateTodo}
-                            filter={filter}
-                  />
-            </div>
-            <div className="toggleButtons">
-              <button onClick={setIsFeatureOneVisible} style={{marginRight:".5em"}}>
-                Toggle Check All Section
-              </button>
-              <button onClick={setIsFeatureTwoVisible} style={{marginLeft:".5em"}}>
-                Toggle Filter Section
-              </button>
-            </div>
-            {isFeatureOneVisible && <div className="CheckAllContainer">
-               <TodoCheckAllButton completeAllTodos={completeAllTodos} />
-              <TodoItemsRemaining todos={todos} />
-            </div>}
-            { isFeatureTwoVisible && <TodosFilter clearCompletedTodos={clearCompletedTodos}
-                           filter={filter}
-                           setFilter={setFilter}
-                           todosFiltered={todosFiltered}
-              />}
-          </div> ) : (<NoTodoContainer />)
-          }
+          <TodoForm />
+          <SwitchTransition mode="out-in">
+            <CSSTransition
+                in={isFeatureOneVisible}
+                timeout={300}
+                key={todos.length > 0}
+                classNames="slide-vertical"
+                unmountOnExit
+            >
+              {todos.length > 0 ? ( <div>
+                <div className="UpdateTasks">
+                  <TodoList />
+                </div>
+                <div className="toggleButtons">
+                  <button onClick={setIsFeatureOneVisible} style={{marginRight:".5em"}}>
+                    Toggle Check All Section
+                  </button>
+                  <button onClick={setIsFeatureTwoVisible} style={{marginLeft:".5em"}}>
+                    Toggle Filter Section
+                  </button>
+                </div>
+                <CSSTransition
+                    in={isFeatureOneVisible}
+                    timeout={300}
+                    classNames="slide-vertical"
+                    unmountOnExit
+                >
+                  <div className="CheckAllContainer">
+                    <TodoCheckAllButton />
+                    <TodoItemsRemaining />
+                  </div>
+                </CSSTransition>
+                <CSSTransition
+                    in={isFeatureTwoVisible}
+                    timeout={300}
+                    classNames="slide-vertical"
+                    unmountOnExit
+                >
+                  <TodosFilter />
+                </CSSTransition>
+              </div> ) : (<NoTodoContainer />)
+              }
+            </CSSTransition>
+          </SwitchTransition>
       </div>
       </div>
     </div>
+      </TodosContext.Provider>
   );
 }
 export default App;

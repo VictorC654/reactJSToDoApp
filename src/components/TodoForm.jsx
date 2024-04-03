@@ -1,24 +1,28 @@
-import React, {useState} from 'react';
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import React, {useContext, useState} from 'react';
 import '../App.css';
+import {TodosContext} from "../context/TodosContext";
 
-export default function TodoForm(props)
+export default function TodoForm()
 {
     const [todoInput, setTodoInput] = useState('');
+    const todosContext = useContext(TodosContext);
     function handleInput(event)
     {
         setTodoInput(event.target.value);
     }
-    function handleSubmit(event)
+    function addTodo(todo)
     {
+        todosContext.setTodos([...todosContext.todos, { id:todosContext.idForToDo, title:todo, isComplete: false}]);
+        todosContext.setIdForToDo(prevState => prevState + 1);
+    }
+    function handleSubmit(event) {
         event.preventDefault();
-        if(todoInput.trim().length === 0)
-        {
+        if (todoInput.trim().length === 0) {
             return;
         }
         setTodoInput('');
 
-        props.addTodo(todoInput);
+        addTodo(todoInput);
     }
     return (
         <form action="#" onSubmit={handleSubmit} style={{width:'100%'}}>

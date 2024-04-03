@@ -1,16 +1,17 @@
-import React, {useMemo, useState} from 'react';
+import React, {useContext, useMemo} from 'react';
 import '../App.css';
+import {TodosContext} from "../context/TodosContext";
 
-export default function NoTodoContainer(props)
+export default function TodoItemsRemaining()
 {
+    const { todos } = useContext(TodosContext)
     function getRemainingTodos()
     {
-        const remainingTodos = props.todos.filter((todo) => !todo.isComplete);
+        const remainingTodos = todos.filter((todo) => !todo.isComplete);
         console.log("calculating todos slowly..");
-        // for(let index = 0; index < 2000000000; index++) {}
         return remainingTodos.length;
     }
-    const cachedRemainingTodos = useMemo(getRemainingTodos, [props.todos]);
+    const cachedRemainingTodos = useMemo(getRemainingTodos, [todos]);
     return (
         <div className="NumberOfItemsRemaining">
             { cachedRemainingTodos } items remaining

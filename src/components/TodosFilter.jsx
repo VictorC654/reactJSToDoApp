@@ -1,32 +1,40 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import '../App.css';
-export default function NoTodoContainer(props)
+import {TodosContext} from "../context/TodosContext";
+export default function TodosFilter()
 {
+    const { todosFiltered, setFilter, filter, setTodos } = useContext(TodosContext);
+    function clearCompletedTodos()
+    {
+        setTodos(current => current.filter(todo => {
+            return todo.isComplete !== true;
+        }))
+    }
     return (
         <div className="FilterContainer">
-            <button className={props.filter === "all" ? 'ActiveButton' : ''}
+            <button className={filter === "all" ? 'ActiveButton' : ''}
             onClick={() => {
-                props.setFilter("all");
-                props.todosFiltered("all");
+                setFilter("all");
+                todosFiltered("all");
             }}>
                 All
             </button>
-            <button className={props.filter === "active" ? 'ActiveButton' : ''} style={{marginLeft:'.5em'}}
+            <button className={filter === "active" ? 'ActiveButton' : ''} style={{marginLeft:'.5em'}}
             onClick={() => {
-                props.setFilter("active");
-                props.todosFiltered("active");
+                setFilter("active");
+                todosFiltered("active");
             }}>
                 Active
             </button>
-            <button className={props.filter === "completed" ? 'ActiveButton' : ''} style={{marginLeft:'.5em'}}
+            <button className={filter === "completed" ? 'ActiveButton' : ''} style={{marginLeft:'.5em'}}
             onClick={() => {
-                props.setFilter("completed");
-                props.todosFiltered("completed");
+                setFilter("completed");
+                todosFiltered("completed");
             }}>
                 Completed
             </button>
-            <button style={{ marginLeft:'auto'}} className="ActiveButton" onClick={props.clearCompletedTodos}>Clear completed</button>
+            <button style={{ marginLeft:'auto'}} className="ActiveButton" onClick={clearCompletedTodos}>Clear completed</button>
         </div>
     );
 }
